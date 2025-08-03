@@ -10,6 +10,8 @@ import { StatsView } from '@/components/stats/StatsView';
 import { SettingsView } from '@/components/settings/SettingsView';
 import { EditDayModal } from '@/components/shared/EditDayModal';
 import { ConfettiCannon } from '@/components/shared/ConfettiCannon';
+import { useDrinkStats } from '@/hooks/use-drink-stats';
+import { useFavicon } from '@/hooks/use-favicon';
 
 type View = 'dashboard' | 'calendar' | 'stats' | 'settings';
 
@@ -21,11 +23,20 @@ const navItems = [
 ] as const;
 
 export function AppShell() {
-  const { loading, showConfetti } = useData();
+  const { loading, showConfetti, drinks } = useData();
+  const { weather } = useDrinkStats(drinks);
   const [view, setView] = useState<View>('dashboard');
   const [direction, setDirection] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalDate, setModalDate] = useState(new Date());
+
+  const faviconEmoji = {
+    sunny: '☀️',
+    rainy: '🌧️',
+    stormy: '⛈️',
+  };
+
+  useFavicon(faviconEmoji[weather]);
 
   const changeView = (newView: View) => {
     if (newView === view) return;
