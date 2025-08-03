@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Download } from 'lucide-react';
+import { Upload, Download, LogOut } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 import { toast } from 'sonner';
 import { Drink } from '@/types';
@@ -26,7 +26,7 @@ const viewVariants = {
 };
 
 export const SettingsView = ({ direction }: { direction: number }) => {
-  const { drinks, importDrinks } = useData();
+  const { drinks, importDrinks, logout } = useData();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const arrayToCsv = (data: Drink[], template = false) => {
@@ -128,6 +128,15 @@ export const SettingsView = ({ direction }: { direction: number }) => {
             <button onClick={handleExportTemplate} className="flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition-colors"><Download size={18} className="mr-2"/>Export Template</button>
             <input type="file" ref={fileInputRef} onChange={handleImport} accept=".csv" className="hidden" />
           </div>
+        </div>
+
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+          <h3 className="text-lg font-semibold">Account</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Manage your session.</p>
+          <button onClick={logout} className="flex items-center justify-center px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition-colors">
+            <LogOut size={18} className="mr-2"/>
+            Log Out
+          </button>
         </div>
       </div>
     </motion.div>

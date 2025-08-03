@@ -6,6 +6,7 @@ import { Drink } from '@/types';
 import { User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface DataContextType {
   user: User | null;
@@ -15,6 +16,7 @@ interface DataContextType {
   importDrinks: (newDrinks: { drink_date: string }[]) => Promise<void>;
   showConfetti: boolean;
   triggerConfetti: () => void;
+  logout: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -24,27 +26,35 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [drinks, setDrinks] = useState<Drink[]>([]);
   const [loading, setLoading] = useState(true);
   const [showConfetti, setShowConfetti] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      if (!session?.user) {
-        await supabase.auth.signInAnonymously();
-      }
-      setLoading(false);
-    };
-    getSession();
-
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        setLoading(false);
+      }
     });
 
     return () => {
       authListener?.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    const isAuthPage = pathname === '/login';
+    if (!user && !isAuthPage) {
+      router.push('/login');
+    } else if (user && isAuthPage) {
+      router.push('/');
+    }
+  }, [user, loading, pathname, router]);
 
   useEffect(() => {
     if (user) {
@@ -62,6 +72,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         }
       };
       fetchDrinks();
+    } else {
+      setDrinks([]);
     }
   }, [user]);
   
@@ -154,8 +166,20 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }, 8000);
   };
 
+  const logout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    toast.success("You have been logged out.");
+  };
+
+  const value = { user, drinks, loading, setDrinksForDate, importDrinks, showConfetti, triggerConfetti, logout };
+
+  if (loading || (!user && pathname !== '/login') || (user && pathname === '/login')) {
+    return null;
+  }
+
   return (
-    <DataContext.Provider value={{ user, drinks, loading, setDrinksForDate, importDrinks, showConfetti, triggerConfetti }}>
+    <DataContext.Provider value={value}>
       {children}
     </DataContext.Provider>
   );
