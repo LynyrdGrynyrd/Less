@@ -4,9 +4,18 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/lib/supabase/client';
 import { useTheme } from 'next-themes';
+import { useData } from '@/context/DataContext';
+import { useAuthRedirect } from '@/hooks/use-auth-redirect';
+import { FullScreenLoader } from '@/components/shared/FullScreenLoader';
 
 const Login = () => {
+  useAuthRedirect();
   const { theme } = useTheme();
+  const { authLoading } = useData();
+
+  if (authLoading) {
+    return <FullScreenLoader />;
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">

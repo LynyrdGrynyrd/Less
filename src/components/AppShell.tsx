@@ -13,6 +13,8 @@ import { ConfettiCannon } from '@/components/shared/ConfettiCannon';
 import { useDrinkStats } from '@/hooks/use-drink-stats';
 import { useFavicon } from '@/hooks/use-favicon';
 import { DashboardSkeleton } from './dashboard/DashboardSkeleton';
+import { useAuthRedirect } from '@/hooks/use-auth-redirect';
+import { FullScreenLoader } from './shared/FullScreenLoader';
 
 type View = 'dashboard' | 'calendar' | 'stats' | 'settings';
 
@@ -24,7 +26,8 @@ const navItems = [
 ] as const;
 
 export const AppShell = () => {
-  const { loading, showConfetti, drinks } = useData();
+  useAuthRedirect();
+  const { authLoading, drinksLoading, showConfetti, drinks } = useData();
   const { weather } = useDrinkStats(drinks);
   const [view, setView] = useState<View>('dashboard');
   const [direction, setDirection] = useState(0);
@@ -66,7 +69,11 @@ export const AppShell = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading) {
+    return <FullScreenLoader />;
+  }
+
+  if (drinksLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto max-w-4xl">
