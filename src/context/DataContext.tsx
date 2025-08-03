@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Drink } from '@/types';
 import { User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
+import { formatDate } from '@/lib/utils';
 
 interface DataContextType {
   user: User | null;
@@ -12,6 +13,8 @@ interface DataContextType {
   loading: boolean;
   setDrinksForDate: (date: Date, count: number) => Promise<void>;
   importDrinks: (newDrinks: { drink_date: string }[]) => Promise<void>;
+  showConfetti: boolean;
+  triggerConfetti: () => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -20,6 +23,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [drinks, setDrinks] = useState<Drink[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     const getSession = async () => {
@@ -143,8 +147,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const triggerConfetti = () => {
+    setShowConfetti(true);
+    setTimeout(() => {
+      setShowConfetti(false);
+    }, 8000);
+  };
+
   return (
-    <DataContext.Provider value={{ user, drinks, loading, setDrinksForDate, importDrinks }}>
+    <DataContext.Provider value={{ user, drinks, loading, setDrinksForDate, importDrinks, showConfetti, triggerConfetti }}>
       {children}
     </DataContext.Provider>
   );

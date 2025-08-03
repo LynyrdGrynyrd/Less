@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Droplet, Calendar, BarChart2 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 import { useDrinkStats } from '@/hooks/use-drink-stats';
 import { SailingVisual } from './SailingVisual';
 import { AnimatedStatCard } from './AnimatedStatCard';
+import { toast } from 'sonner';
 
 const viewVariants = {
   initial: (direction: number) => ({
@@ -25,8 +27,17 @@ const viewVariants = {
 };
 
 export const DashboardView = ({ direction }: { direction: number }) => {
-  const { drinks } = useData();
+  const { drinks, triggerConfetti } = useData();
   const { drinksThisWeek, currentStreak, longestStreak, weather } = useDrinkStats(drinks);
+  const prevLongestStreakRef = useRef<number>();
+
+  useEffect(() => {
+    if (prevLongestStreakRef.current !== undefined && longestStreak > prevLongestStreakRef.current) {
+      toast.success(`🎉 New record! You've reached a new longest streak of ${longestStreak} days!`);
+      triggerConfetti();
+    }
+    prevLongestStreakRef.current = longestStreak;
+  }, [longestStreak, triggerConfetti]);
 
   return (
     <motion.div

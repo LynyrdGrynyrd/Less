@@ -9,6 +9,7 @@ import { CalendarView } from '@/components/calendar/CalendarView';
 import { StatsView } from '@/components/stats/StatsView';
 import { SettingsView } from '@/components/settings/SettingsView';
 import { EditDayModal } from '@/components/shared/EditDayModal';
+import { ConfettiCannon } from '@/components/shared/ConfettiCannon';
 
 type View = 'dashboard' | 'calendar' | 'stats' | 'settings';
 
@@ -20,7 +21,7 @@ const navItems = [
 ] as const;
 
 export function AppShell() {
-  const { loading } = useData();
+  const { loading, showConfetti } = useData();
   const [view, setView] = useState<View>('dashboard');
   const [direction, setDirection] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,6 +64,7 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans">
+      {showConfetti && <ConfettiCannon />}
       <div className="container mx-auto max-w-4xl pb-24 relative overflow-x-hidden">
         <AnimatePresence mode="wait" custom={direction}>
           {renderView()}
@@ -81,7 +83,7 @@ export function AppShell() {
         aria-label="Add Drink for Today"
       >
         <Plus size={24} />
-      </motion.button>
+      </button>
 
       <footer className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <nav className="container mx-auto max-w-4xl flex justify-around p-2">
