@@ -26,18 +26,32 @@ const viewVariants = {
   }),
 };
 
+const STREAK_MILESTONES = [7, 14, 30, 60, 90, 182, 365];
+
 export const DashboardView = ({ direction }: { direction: number }) => {
   const { drinks, triggerConfetti } = useData();
   const { drinksThisWeek, currentStreak, longestStreak, weather } = useDrinkStats(drinks);
   const prevLongestStreakRef = useRef<number>();
+  const prevCurrentStreakRef = useRef<number>();
 
   useEffect(() => {
+    // Check for new longest streak record
     if (prevLongestStreakRef.current !== undefined && longestStreak > prevLongestStreakRef.current) {
       toast.success(`🎉 New record! You've reached a new longest streak of ${longestStreak} days!`);
       triggerConfetti();
     }
     prevLongestStreakRef.current = longestStreak;
-  }, [longestStreak, triggerConfetti]);
+
+    // Check for current streak milestones
+    if (prevCurrentStreakRef.current !== undefined && currentStreak > prevCurrentStreakRef.current) {
+        if (STREAK_MILESTONES.includes(currentStreak)) {
+            toast.success(`🥳 Awesome! You've hit a ${currentStreak}-day sober streak!`);
+            triggerConfetti();
+        }
+    }
+    prevCurrentStreakRef.current = currentStreak;
+
+  }, [longestStreak, currentStreak, triggerConfetti]);
 
   return (
     <motion.div
