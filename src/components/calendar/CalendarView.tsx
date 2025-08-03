@@ -35,6 +35,7 @@ export const CalendarView = ({ onDayClick, direction }: CalendarViewProps) => {
   const { drinks } = useData();
   const { drinksByDate } = useDrinkStats(drinks);
   const [viewType, setViewType] = useState('month');
+  const [displayDate, setDisplayDate] = useState(new Date());
 
   const modifiers = useMemo(() => ({
     level1: (date: Date) => {
@@ -55,6 +56,15 @@ export const CalendarView = ({ onDayClick, direction }: CalendarViewProps) => {
     level1: 'day-level-1',
     level2: 'day-level-2',
     level3: 'day-level-3',
+  };
+
+  const handleMonthClick = (monthIndex: number) => {
+    setDisplayDate(new Date(displayDate.getFullYear(), monthIndex, 1));
+    setViewType('month');
+  };
+
+  const handleYearChange = (newYear: number) => {
+    setDisplayDate(new Date(newYear, displayDate.getMonth(), 1));
   };
 
   return (
@@ -78,10 +88,16 @@ export const CalendarView = ({ onDayClick, direction }: CalendarViewProps) => {
             modifiers={modifiers}
             modifiersClassNames={modifiersClassNames}
             className="p-0"
+            month={displayDate}
+            onMonthChange={setDisplayDate}
           />
         </div>
       ) : (
-        <YearlyHeatmap onDayClick={onDayClick} />
+        <YearlyHeatmap 
+          year={displayDate.getFullYear()}
+          onYearChange={handleYearChange}
+          onMonthClick={handleMonthClick}
+        />
       )}
     </motion.div>
   );
