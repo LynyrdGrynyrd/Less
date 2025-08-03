@@ -22,7 +22,7 @@ const navItems = [
     { id: 'settings', label: 'Settings', icon: Settings },
 ] as const;
 
-export function AppShell() {
+export const AppShell = () => {
   const { loading, showConfetti, drinks } = useData();
   const { weather } = useDrinkStats(drinks);
   const [view, setView] = useState<View>('dashboard');
@@ -94,7 +94,7 @@ export function AppShell() {
         aria-label="Add Drink for Today"
       >
         <Plus size={24} />
-      </button>
+      </motion.button>
 
       <footer className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <nav className="container mx-auto max-w-4xl flex justify-around p-2">
@@ -114,4 +114,4 @@ export function AppShell() {
       </footer>
     </div>
   );
-}
+};
