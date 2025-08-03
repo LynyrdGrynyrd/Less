@@ -7,6 +7,7 @@ import { User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
+import { FullScreenLoader } from '@/components/shared/FullScreenLoader';
 
 interface DataContextType {
   user: User | null;
@@ -174,8 +175,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   const value = { user, drinks, loading, setDrinksForDate, importDrinks, showConfetti, triggerConfetti, logout };
 
-  if (loading || (!user && pathname !== '/login') || (user && pathname === '/login')) {
-    return null;
+  if (loading) {
+    return <FullScreenLoader />;
+  }
+
+  const isAuthPage = pathname === '/login';
+  if ((!user && !isAuthPage) || (user && isAuthPage)) {
+    return <FullScreenLoader />;
   }
 
   return (
