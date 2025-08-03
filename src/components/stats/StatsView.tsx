@@ -3,9 +3,11 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Droplet, TrendingUp } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 import { getStartOfWeek } from '@/lib/utils';
 import { FilterButtons } from '@/components/shared/FilterButtons';
+import { AnimatedStatCard } from '@/components/dashboard/AnimatedStatCard';
 
 const viewVariants = {
   initial: (direction: number) => ({
@@ -28,7 +30,7 @@ export const StatsView = ({ direction }: { direction: number }) => {
   const { drinks } = useData();
   const [period, setPeriod] = useState('week');
 
-  const chartData = useMemo(() => {
+  const { chartData, totalDrinks, busiestPeriod } = useMemo(() => {
     const now = new Date();
     const dataMap = new Map<string, number>();
 
@@ -67,7 +69,18 @@ export const StatsView = ({ direction }: { direction: number }) => {
       });
     }
 
-    return Array.from(dataMap, ([name, drinks]) => ({ name, drinks }));
+    const data = Array.from(dataMap, ([name, drinks]) => ({ name, drinks }));
+    const total = data.reduce((sum, item) => sum + item.drinks, 0);
+
+    let busiest = { name: 'N/A', drinks: 0 };
+    if (data.length > 0) {
+      const maxPeriod = data.reduce((max, item) => item.drinks > max.drinks ? item : max, data[0]);
+      if (maxPeriod.drinks > 0) {
+        busiest = maxPeriod;
+      }
+    }
+
+    return { chartData: data, totalDrinks: total, busiestPeriod: busiest };
   }, [drinks, period]);
 
   return (
@@ -87,6 +100,25 @@ export const StatsView = ({ direction }: { direction: number }) => {
           onSelect={setPeriod}
         />
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <AnimatedStatCard 
+          title="Total Drinks"
+          subtitle={`This ${period}`}
+          value={totalDrinks} 
+          icon={<Droplet size={24} className="text-white"/>} 
+          color="bg-blue-400" 
+        />
+        <AnimatedStatCard 
+          title="Busiest Period"
+          subtitle={busiestPeriod.name}
+          value={busiestPeriod.drinks} 
+          icon={<TrendingUp size={24} className="text-white"/>} 
+          color="bg-red-400"
+          unit="drinks"
+        />
+      </div>
+
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md h-80">
         <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Consumption Overview</h3>
         <ResponsiveContainer width="100%" height="100%">

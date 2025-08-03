@@ -9,9 +9,10 @@ interface AnimatedStatCardProps {
   icon: React.ReactNode;
   color: string;
   unit?: string;
+  subtitle?: string;
 }
 
-export const AnimatedStatCard = ({ title, value, icon, color, unit = '' }: AnimatedStatCardProps) => {
+export const AnimatedStatCard = ({ title, value, icon, color, unit = '', subtitle }: AnimatedStatCardProps) => {
   const spring = useSpring(value, { stiffness: 75, damping: 25 });
   const display = useTransform(spring, (current) => Math.round(current));
 
@@ -30,6 +31,7 @@ export const AnimatedStatCard = ({ title, value, icon, color, unit = '' }: Anima
       </div>
       <div>
         <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
+        {subtitle && <p className="text-xs text-gray-400 dark:text-gray-500 -mt-1">{subtitle}</p>}
         <div className="flex items-baseline">
           <motion.p className="text-2xl font-bold text-gray-800 dark:text-gray-200">{display}</motion.p>
           {unit && <span className="text-lg ml-1 text-gray-600 dark:text-gray-400">{unit}</span>}
