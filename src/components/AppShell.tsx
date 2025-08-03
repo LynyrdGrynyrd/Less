@@ -12,6 +12,7 @@ import { EditDayModal } from '@/components/shared/EditDayModal';
 import { ConfettiCannon } from '@/components/shared/ConfettiCannon';
 import { useDrinkStats } from '@/hooks/use-drink-stats';
 import { useFavicon } from '@/hooks/use-favicon';
+import { DashboardSkeleton } from './dashboard/DashboardSkeleton';
 
 type View = 'dashboard' | 'calendar' | 'stats' | 'settings';
 
@@ -67,8 +68,10 @@ export const AppShell = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <p className="text-gray-600 dark:text-gray-400 animate-pulse">Initializing your space...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto max-w-4xl">
+          <DashboardSkeleton />
+        </div>
       </div>
     );
   }
