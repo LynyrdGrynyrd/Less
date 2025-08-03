@@ -151,3 +151,37 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .day-level-1 {
+    @apply bg-blue-200 dark:bg-blue-800 text-current rounded-md;
+  }
+  .day-level-1:hover {
+    @apply bg-blue-300 dark:bg-blue-700;
+  }
+  .day-level-2 {
+    @apply bg-blue-400 dark:bg-blue-600 text-white rounded-md;
+  }
+  .day-level-2:hover {
+    @apply bg-blue-500 dark:bg-blue-500;
+  }
+  .day-level-3 {
+    @apply bg-blue-600 dark:bg-blue-400 text-white dark:text-black rounded-md;
+  }
+  .day-level-3:hover {
+    @apply bg-blue-700 dark:bg-blue-300;
+  }
+
+  /* Override selected styles to not conflict with our custom backgrounds */
+  .rdp-day_selected.day-level-1,
+  .rdp-day_selected.day-level-2,
+  .rdp-day_selected.day-level-3 {
+    @apply text-inherit;
+  }
+  .rdp-day_selected:focus-visible:not([disabled]) {
+    @apply ring-0 ring-offset-0;
+  }
+  .rdp-day_selected:hover {
+    @apply bg-primary/90;
+  }
+}
