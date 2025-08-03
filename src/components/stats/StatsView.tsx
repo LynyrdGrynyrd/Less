@@ -7,7 +7,24 @@ import { useData } from '@/context/DataContext';
 import { getStartOfWeek } from '@/lib/utils';
 import { FilterButtons } from '@/components/shared/FilterButtons';
 
-export const StatsView = () => {
+const viewVariants = {
+  initial: (direction: number) => ({
+    x: direction > 0 ? 30 : -30,
+    opacity: 0,
+  }),
+  animate: {
+    x: 0,
+    opacity: 1,
+    transition: { type: 'spring', stiffness: 260, damping: 30 },
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? 30 : -30,
+    opacity: 0,
+    transition: { type: 'spring', stiffness: 260, damping: 30 },
+  }),
+};
+
+export const StatsView = ({ direction }: { direction: number }) => {
   const { drinks } = useData();
   const [period, setPeriod] = useState('week');
 
@@ -55,10 +72,11 @@ export const StatsView = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      transition={{ duration: 0.3 }}
+      custom={direction}
+      variants={viewVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
       className="p-4"
     >
       <h2 className="text-2xl font-bold mb-4">Statistics</h2>

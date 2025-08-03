@@ -11,9 +11,27 @@ import { YearlyHeatmap } from './YearlyHeatmap';
 
 interface CalendarViewProps {
   onDayClick: (date: Date) => void;
+  direction: number;
 }
 
-export const CalendarView = ({ onDayClick }: CalendarViewProps) => {
+const viewVariants = {
+  initial: (direction: number) => ({
+    x: direction > 0 ? 30 : -30,
+    opacity: 0,
+  }),
+  animate: {
+    x: 0,
+    opacity: 1,
+    transition: { type: 'spring', stiffness: 260, damping: 30 },
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? 30 : -30,
+    opacity: 0,
+    transition: { type: 'spring', stiffness: 260, damping: 30 },
+  }),
+};
+
+export const CalendarView = ({ onDayClick, direction }: CalendarViewProps) => {
   const { drinks } = useData();
   const { drinksByDate } = useDrinkStats(drinks);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -80,10 +98,11 @@ export const CalendarView = ({ onDayClick }: CalendarViewProps) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      transition={{ duration: 0.3 }}
+      custom={direction}
+      variants={viewVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
       className="p-4"
     >
       <h2 className="text-2xl font-bold mb-4">Calendar</h2>

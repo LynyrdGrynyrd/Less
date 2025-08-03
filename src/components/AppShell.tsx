@@ -22,8 +22,17 @@ const navItems = [
 export function AppShell() {
   const { loading } = useData();
   const [view, setView] = useState<View>('dashboard');
+  const [direction, setDirection] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalDate, setModalDate] = useState(new Date());
+
+  const changeView = (newView: View) => {
+    if (newView === view) return;
+    const oldIndex = navItems.findIndex(item => item.id === view);
+    const newIndex = navItems.findIndex(item => item.id === newView);
+    setDirection(newIndex > oldIndex ? 1 : -1);
+    setView(newView);
+  };
 
   const handleDayClick = (date: Date) => {
     setModalDate(date);
@@ -33,14 +42,14 @@ export function AppShell() {
   const renderView = () => {
     switch (view) {
       case 'calendar':
-        return <CalendarView key="calendar" onDayClick={handleDayClick} />;
+        return <CalendarView key="calendar" onDayClick={handleDayClick} direction={direction} />;
       case 'stats':
-        return <StatsView key="stats" />;
+        return <StatsView key="stats" direction={direction} />;
       case 'settings':
-        return <SettingsView key="settings" />;
+        return <SettingsView key="settings" direction={direction} />;
       case 'dashboard':
       default:
-        return <DashboardView key="dashboard" />;
+        return <DashboardView key="dashboard" direction={direction} />;
     }
   };
 
@@ -54,8 +63,10 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans">
-      <div className="container mx-auto max-w-4xl pb-24">
-        <AnimatePresence mode="wait">{renderView()}</AnimatePresence>
+      <div className="container mx-auto max-w-4xl pb-24 relative overflow-x-hidden">
+        <AnimatePresence mode="wait" custom={direction}>
+          {renderView()}
+        </AnimatePresence>
       </div>
 
       <AnimatePresence>
@@ -77,7 +88,7 @@ export function AppShell() {
           {navItems.map(item => (
             <button
               key={item.id}
-              onClick={() => setView(item.id)}
+              onClick={() => changeView(item.id)}
               className={`flex flex-col items-center p-2 rounded-lg w-24 transition-colors ${
                 view === item.id ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'
               }`}

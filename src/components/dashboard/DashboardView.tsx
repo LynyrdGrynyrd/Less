@@ -7,16 +7,34 @@ import { useDrinkStats } from '@/hooks/use-drink-stats';
 import { SailingVisual } from './SailingVisual';
 import { AnimatedStatCard } from './AnimatedStatCard';
 
-export const DashboardView = () => {
+const viewVariants = {
+  initial: (direction: number) => ({
+    x: direction > 0 ? 30 : -30,
+    opacity: 0,
+  }),
+  animate: {
+    x: 0,
+    opacity: 1,
+    transition: { type: 'spring', stiffness: 260, damping: 30 },
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? 30 : -30,
+    opacity: 0,
+    transition: { type: 'spring', stiffness: 260, damping: 30 },
+  }),
+};
+
+export const DashboardView = ({ direction }: { direction: number }) => {
   const { drinks } = useData();
   const { drinksThisWeek, currentStreak, longestStreak, weather } = useDrinkStats(drinks);
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      transition={{ duration: 0.3 }}
+      custom={direction}
+      variants={viewVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
       className="p-4"
     >
       <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Dashboard</h1>
